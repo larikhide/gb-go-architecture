@@ -136,18 +136,8 @@ func TestMapDBUpdateItem(t *testing.T) {
 		Name:  "TestName_1",
 		Price: 10.0,
 	}
-	currentID++
 
-	mDB.db[currentID] = &models.Item{
-		ID:    currentID,
-		Name:  "UpdatedName_1",
-		Price: 15.0,
-	}
-
-	updatedItem, err := mDB.UpdateItem(mDB.db[currentID])
-	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
-		t.Error("expected ID error")
-	}
+	updatedItem, err := mDB.UpdateItem(mDB.db[currentID], "NewTestName", 69)
 
 	if updatedItem.Name != mDB.db[currentID].Name {
 		t.Errorf("expected name == %s, have %s", updatedItem.Name, mDB.db[currentID].Name)
@@ -155,5 +145,10 @@ func TestMapDBUpdateItem(t *testing.T) {
 
 	if updatedItem.Price != mDB.db[currentID].Price {
 		t.Errorf("expected name == %d, have %d", updatedItem.Price, mDB.db[currentID].Price)
+	}
+
+	currentID++
+	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
+		t.Error("expected ID error")
 	}
 }
