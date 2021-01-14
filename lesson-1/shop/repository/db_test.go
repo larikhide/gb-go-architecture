@@ -79,7 +79,7 @@ func TestMapDBCreateItem(t *testing.T) {
 }
 
 func TestMapDBGetItem(t *testing.T) {
-	// тесты в последствии запускаются сразу все? если да, то логично тестовую БД вынести в глобальую переменную с тестовыми экземплярами
+	// нельзя ли создать для тестов глобальную переменную?
 	mDB := mapDB{
 		db:    make(map[int32]*models.Item, 5),
 		maxID: 0,
@@ -92,9 +92,16 @@ func TestMapDBGetItem(t *testing.T) {
 		Price: 10.0,
 	}
 
-	currentID++
+	gottenItem, err := mDB.GetItem(currentID)
+	if gottenItem.Name != mDB.db[currentID].Name {
+		t.Errorf("expected name == %s, have %s", gottenItem.Name, mDB.db[currentID].Name)
+	}
 
-	_, err := mDB.GetItem(currentID)
+	if gottenItem.Price != mDB.db[currentID].Price {
+		t.Errorf("expected name == %d, have %d", gottenItem.Price, mDB.db[currentID].Price)
+	}
+
+	currentID++
 
 	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
 		t.Error("expected ID error")
@@ -102,7 +109,7 @@ func TestMapDBGetItem(t *testing.T) {
 	}
 }
 
-/* func TestMapDBDeleteItem(t *testing.T) {
+func TestMapDBDeleteItem(t *testing.T) {
 	mDB := mapDB{
 		db:    make(map[int32]*models.Item, 5),
 		maxID: 0,
@@ -115,5 +122,38 @@ func TestMapDBGetItem(t *testing.T) {
 		t.Error("some expected delete error")
 		return
 	}
+}
 
-} */
+func TestMapDBUpdateItem(t *testing.T) {
+	mDB := mapDB{
+		db:    make(map[int32]*models.Item, 5),
+		maxID: 0,
+	}
+
+	currentID := int32(1)
+	mDB.db[currentID] = &models.Item{
+		ID:    currentID,
+		Name:  "TestName_1",
+		Price: 10.0,
+	}
+	currentID++
+
+	mDB.db[currentID] = &models.Item{
+		ID:    currentID,
+		Name:  "UpdatedName_1",
+		Price: 15.0,
+	}
+
+	updatedItem, err := mDB.UpdateItem(mDB.db[currentID])
+	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
+		t.Error("expected ID error")
+	}
+
+	if updatedItem.Name != mDB.db[currentID].Name {
+		t.Errorf("expected name == %s, have %s", updatedItem.Name, mDB.db[currentID].Name)
+	}
+
+	if updatedItem.Price != mDB.db[currentID].Price {
+		t.Errorf("expected name == %d, have %d", updatedItem.Price, mDB.db[currentID].Price)
+	}
+}
