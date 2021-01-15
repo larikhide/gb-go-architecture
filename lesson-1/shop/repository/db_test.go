@@ -6,6 +6,12 @@ import (
 	"testing"
 )
 
+var existingItem = &models.Item{
+	ID:    int32(1),
+	Name:  "TestName_1",
+	Price: 10.0,
+}
+
 func TestMapDBCreateItem(t *testing.T) {
 	mDB := mapDB{
 		db:    make(map[int32]*models.Item, 5),
@@ -85,23 +91,21 @@ func TestMapDBGetItem(t *testing.T) {
 		maxID: 0,
 	}
 
-	currentID := int32(1)
-	mDB.db[currentID] = &models.Item{
-		ID:    currentID,
-		Name:  "TestName_1",
-		Price: 10.0,
+	exampleItem, err := mDB.CreateItem(existingItem)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	gottenItem, err := mDB.GetItem(currentID)
-	if gottenItem.Name != mDB.db[currentID].Name {
-		t.Errorf("expected name == %s, have %s", gottenItem.Name, mDB.db[currentID].Name)
+	gottenItem, err := mDB.GetItem(exampleItem.ID)
+	if gottenItem.Name != exampleItem.Name {
+		t.Errorf("expected name == %s, have %s", gottenItem.Name, exampleItem.Name)
 	}
 
-	if gottenItem.Price != mDB.db[currentID].Price {
-		t.Errorf("expected name == %d, have %d", gottenItem.Price, mDB.db[currentID].Price)
+	if gottenItem.Price != exampleItem.Price {
+		t.Errorf("expected name == %d, have %d", gottenItem.Price, exampleItem.Price)
 	}
 
-	currentID++
+	currentID := exampleItem.ID + 1
 
 	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
 		t.Error("expected ID error")
@@ -120,7 +124,6 @@ func TestMapDBDeleteItem(t *testing.T) {
 	err := mDB.DeleteItem(currentID)
 	if err != nil {
 		t.Error("some expected delete error")
-		return
 	}
 }
 
