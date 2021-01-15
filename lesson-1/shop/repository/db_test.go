@@ -85,7 +85,6 @@ func TestMapDBCreateItem(t *testing.T) {
 }
 
 func TestMapDBGetItem(t *testing.T) {
-	// нельзя ли создать для тестов глобальную переменную?
 	mDB := mapDB{
 		db:    make(map[int32]*models.Item, 5),
 		maxID: 0,
@@ -93,23 +92,24 @@ func TestMapDBGetItem(t *testing.T) {
 
 	exampleItem, err := mDB.CreateItem(existingItem)
 	if err != nil {
-		t.Fatal(err)
+		t.Error("unexpected create error") // неожидаемая, т.к. проверяем другой метод в этом тесте, верна логика?
 	}
 
 	gottenItem, err := mDB.GetItem(exampleItem.ID)
+	if gottenItem == nil {
+		if err == fmt.Errorf("Item with ID: %d is not found", gottenItem.ID) {
+			t.Error("expected ID error")
+			return
+		}
+		t.Error("unexpected get error")
+	}
+
 	if gottenItem.Name != exampleItem.Name {
 		t.Errorf("expected name == %s, have %s", gottenItem.Name, exampleItem.Name)
 	}
 
 	if gottenItem.Price != exampleItem.Price {
 		t.Errorf("expected name == %d, have %d", gottenItem.Price, exampleItem.Price)
-	}
-
-	currentID := exampleItem.ID + 1
-
-	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
-		t.Error("expected ID error")
-		return
 	}
 }
 
@@ -119,11 +119,19 @@ func TestMapDBDeleteItem(t *testing.T) {
 		maxID: 0,
 	}
 
-	currentID := int32(1)
-
-	err := mDB.DeleteItem(currentID)
+	deletedItem, err := mDB.CreateItem(existingItem)
 	if err != nil {
-		t.Error("some expected delete error")
+		t.Error("unexpected create error")
+	}
+
+	err = mDB.DeleteItem(deletedItem.ID)
+	if err != nil {
+		t.Error("some delete error")
+	}
+
+	_, err = mDB.GetItem(deletedItem.ID)
+	if err == nil {
+		t.Error("item not deleted")
 	}
 }
 
@@ -133,25 +141,28 @@ func TestMapDBUpdateItem(t *testing.T) {
 		maxID: 0,
 	}
 
-	currentID := int32(1)
-	mDB.db[currentID] = &models.Item{
-		ID:    currentID,
-		Name:  "TestName_1",
-		Price: 10.0,
+	exampleItem, err := mDB.CreateItem(existingItem)
+	if err != nil {
+		t.Error("unexpected create error") // неожидаемая, т.к. проверяем другой метод в этом тесте, верна логика?
 	}
 
-	updatedItem, err := mDB.UpdateItem(mDB.db[currentID], "NewTestName", 69)
+	updName := "UpdatedName"
+	updPrice := int32(322)
 
-	if updatedItem.Name != mDB.db[currentID].Name {
-		t.Errorf("expected name == %s, have %s", updatedItem.Name, mDB.db[currentID].Name)
+	updatedItem, err := mDB.UpdateItem(exampleItem, updName, updPrice)
+	if updatedItem == nil {
+		if err == fmt.Errorf("Item with ID: %d is not found", exampleItem.ID) {
+			t.Error("expected ID error")
+			return
+		}
+		t.Error("unexpected update error")
 	}
 
-	if updatedItem.Price != mDB.db[currentID].Price {
-		t.Errorf("expected name == %d, have %d", updatedItem.Price, mDB.db[currentID].Price)
+	if updatedItem.Name != updName {
+		t.Errorf("expected name == %s, have %s", updatedItem.Name, updName)
 	}
 
-	currentID++
-	if err == fmt.Errorf("Item with ID: %d is not found", currentID) {
-		t.Error("expected ID error")
+	if updatedItem.Price != updPrice {
+		t.Errorf("expected name == %d, have %d", updatedItem.Price, updPrice)
 	}
 }
