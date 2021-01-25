@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"sync"
 )
 
@@ -41,6 +43,19 @@ func (w *Worker) Handle() {
 	defer w.wg.Done()
 	for job := range w.jobChan {
 		log.Printf("worker %d processing job with payload %s", w.num, string(job.payload))
+	}
+}
+
+func (w *Worker) HandleDDoS() {
+	defer w.wg.Done()
+	for job := range w.jobChan {
+		resp, err := http.Get("https://google.com")
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		log.Printf("response is %s", resp.Body)
+		defer resp.Body.Close()
 	}
 }
 
