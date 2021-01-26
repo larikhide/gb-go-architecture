@@ -42,7 +42,7 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 	jobChan := make(chan *Job)
-	for i := 0; i < numThreads; i++ { //тут создается 5 воркеров
+	for i := 0; i < numThreads; i++ { //в цикле создаются воркеры
 		worker := NewWorker(i+1, wg, jobChan)
 		wg.Add(1)
 		go worker.HandleDDoS(addr)
@@ -77,14 +77,15 @@ func (w *Worker) Handle() {
 
 func (w *Worker) HandleDDoS(addr string) {
 	defer w.wg.Done()
+	start := time.Now()
 	for job := range w.jobChan {
 		resp, err := http.Get(addr)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		start := time.Now()
-		log.Printf("worker %d ping %s with time %d ms", w.num, string(job.addr), time.Since(start).Milliseconds()) //ВОПРОС: почему возращается нулевое время?
+
+		log.Printf("worker %d ping %s with time %d ms", w.num, job.addr, time.Since(start).Milliseconds()) //ВОПРОС: почему возращается нулевое время?
 		defer resp.Body.Close()
 	}
 }
