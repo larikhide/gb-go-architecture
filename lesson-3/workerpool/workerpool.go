@@ -11,6 +11,8 @@ import (
 
 type Job struct {
 	payload []byte
+	addr    string
+	method  string //TODO: добавить возможность указывать метод запроса
 }
 
 type Worker struct {
@@ -24,6 +26,9 @@ func main() {
 	flag.IntVar(&numThreads, "c", 1, "number of threads")
 	flag.IntVar(&numJobs, "n", 1, "number of requests")
 	flag.IntVar(&workTime, "t", 1, "time of work in seconds")
+
+	var addr string
+	flag.StringVar(&addr, "a", "https://google.com", "address for DDoS")
 
 	flag.Parse()
 
@@ -40,7 +45,7 @@ func main() {
 	for i := 0; i < numThreads; i++ { //тут создается 5 воркеров
 		worker := NewWorker(i+1, wg, jobChan)
 		wg.Add(1)
-		go worker.Handle()
+		go worker.HandleDDoS(addr)
 	}
 	// отметка по времени, когда началось выполнение джоб
 	start := time.Now()
@@ -51,7 +56,7 @@ func main() {
 			numJobs++ //если был задан флаг на время выполнения, а не количество запросов, то в течении этого времени плодятся новые джобы
 		}
 		jobChan <- &Job{
-			payload: []byte(fmt.Sprintf("Some message %d", i)),
+			addr: addr,
 		}
 	}
 
@@ -59,7 +64,7 @@ func main() {
 	wg.Wait()
 
 	fmt.Println(time.Since(start))
-	fmt.Printf("%.2f RPS\n", float64(numJobs)/float64(time.Since(start)))
+	fmt.Printf("%.2f RPS\n", float64(numJobs)/time.Since(start).Seconds())
 }
 
 // Handle просто шаблон
@@ -70,15 +75,16 @@ func (w *Worker) Handle() {
 	}
 }
 
-func (w *Worker) HandleDDoS() {
+func (w *Worker) HandleDDoS(addr string) {
 	defer w.wg.Done()
 	for job := range w.jobChan {
-		resp, err := http.Get("https://google.com")
+		resp, err := http.Get(addr)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		log.Printf("response is %s and job = %s ", resp.Header, string(job.payload))
+		start := time.Now()
+		log.Printf("worker %d ping %s with time %d ms", w.num, string(job.addr), time.Since(start).Milliseconds()) //ВОПРОС: почему возращается нулевое время?
 		defer resp.Body.Close()
 	}
 }
