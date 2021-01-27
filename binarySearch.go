@@ -1,15 +1,17 @@
 package main
 
+import "errors"
+
 type data []int32
 
-func binarySearch(arr data, reqNum int32) (reqIdx int, err error) {
+func binarySearch(arr data, reqNum int32) (reqIdx int32, err error) {
 	low := 0
 	high := len(arr) - 1
 
 	for low <= high {
 		mid := (low + high) / 2
 		if arr[mid] == reqNum {
-			reqIdx = mid
+			reqIdx = int32(mid)
 			return reqIdx, nil
 		}
 
@@ -20,6 +22,6 @@ func binarySearch(arr data, reqNum int32) (reqIdx int, err error) {
 		}
 	}
 
-	// как вернуть ошибку в строке "not found"?
-	return nil, err
+	err = errors.New("Number not found")
+	return reqNum, err
 }
