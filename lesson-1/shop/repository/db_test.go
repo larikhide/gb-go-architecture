@@ -96,12 +96,11 @@ func TestMapDBGetItem(t *testing.T) {
 	}
 
 	gottenItem, err := mDB.GetItem(exampleItem.ID)
-	if gottenItem == nil {
-		if err == fmt.Errorf("Item with ID: %d is not found", gottenItem.ID) {
-			t.Error("expected ID error")
-			return
-		}
+	if err != nil {
 		t.Error("unexpected get error")
+	}
+	if gottenItem == nil {
+		t.Error("unexpected nil item")
 	}
 
 	if gottenItem.Name != exampleItem.Name {
