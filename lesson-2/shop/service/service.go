@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"shop/models"
+	email "shop/pkg/email"
 	tg "shop/pkg/tgbot"
 	rep "shop/repository"
 )
@@ -15,8 +16,9 @@ type Service interface {
 }
 
 type service struct {
-	tg tg.TelegramAPI
-	db rep.Repository
+	tg    tg.TelegramAPI
+	db    rep.Repository
+	email email.EmailClient
 }
 
 func (s *service) CreateOrder(order *models.Order) (*models.Order, error) {
@@ -48,9 +50,10 @@ func (s *service) CreateItem(item *models.Item) (*models.Item, error) {
 	return s.db.CreateItem(item)
 }
 
-func NewService(tg tg.TelegramAPI, db rep.Repository) Service {
+func NewService(email email.EmailClient, tg tg.TelegramAPI, db rep.Repository) Service {
 	return &service{
-		db: db,
-		tg: tg,
+		db:    db,
+		tg:    tg,
+		email: email,
 	}
 }
