@@ -1,17 +1,18 @@
-package smtp
+package email
 
 import (
-	"errors"
+	"net/smtp"
 	"shop/models"
 )
 
-var (
-	ErrIncorrectEmail = errors.New("email is incorrect")
-)
-
-type SmtpAPI interface {
-	SendOrderNotification(order *models.Order) error
+type EmailClient interface {
+	SendOrderConfirmation(order *models.Order) error
 }
 
-type smtpAPI struct {
+type emailClient struct {
+	cli *smtp.Client
+}
+
+func (email *emailClient) SendOrderConfirmation(order *models.Order) error {
+https: //riptutorial.com/ru/go/example/20761/отправка-электронной-почты-с-помощью-smtp-sendmail---
 }

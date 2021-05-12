@@ -18,6 +18,7 @@ func main() {
 		log.Fatal("Unable to init telegram bot")
 	}
 
+	// TODO: инициализировать эмейл клиент, через NewClient, для этого сначала нужно создать коннекшн
 	db := repository.NewMapDB()
 
 	service := service.NewService(tg, db)

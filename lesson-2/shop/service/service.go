@@ -36,6 +36,11 @@ func (s *service) CreateOrder(order *models.Order) (*models.Order, error) {
 	if err := s.tg.SendOrderNotification(order); err != nil {
 		log.Println(err)
 	}
+
+	if err := s.email.SendOrderConfirmation(order); err != nil {
+		log.Println(err)
+	}
+
 	return order, err
 }
 
