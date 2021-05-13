@@ -36,8 +36,8 @@ func main() {
 		log.Fatalln("specify only one flag 't' or 'n'")
 	}
 
-	if numJobs < 1 || workTime < 1 {
-		log.Fatalln("flags 't' or 'n' should be more or equal than 1")
+	if numJobs < 1 || workTime < 1 || numThreads < 1 {
+		log.Fatalln("flags should be more or equal than 1")
 	}
 
 	wg := &sync.WaitGroup{}
