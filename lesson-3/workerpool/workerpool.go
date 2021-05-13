@@ -85,7 +85,7 @@ func (w *Worker) HandleDDoS(addr string) {
 			continue
 		}
 
-		log.Printf("worker %d ping %s with time %d ms", w.num, job.addr, time.Since(start).Milliseconds()) //ВОПРОС: почему возращается нулевое время?
+		log.Printf("worker %d ping %s with time %d", w.num, job.addr, time.Since(start).Milliseconds())
 		defer resp.Body.Close()
 	}
 }
