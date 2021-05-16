@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"shop/pkg/email"
 	"shop/pkg/tgbot"
 	"shop/repository"
 	"shop/service"
@@ -18,9 +19,19 @@ func main() {
 		log.Fatal("Unable to init telegram bot")
 	}
 
+	// TODO: инициализировать *email.emailClient для этого может понадобиться создать conn
+	/* conn, err := net.Dial("tcp", "mail.example.com")
+	if err != nil {
+		log.Fatal(err)
+	} */
+	em, err := email.NewSMTPClient("tcp", "mail.example.com")
+	if err != nil {
+		log.Fatal("Unable to init smtp client")
+	}
+
 	db := repository.NewMapDB()
 
-	service := service.NewService(tg, db)
+	service := service.NewService(em, tg, db)
 	handler := &shopHandler{
 		service: service,
 		db:      db,
