@@ -25,17 +25,17 @@ func main() {
 		panic(fmt.Sprintf("Not read config file. %s", err))
 	}
 
-	em, err := email.NewSMTPClient(config.host, config.username, config.password)
+	em, err := email.NewSMTPClient(config.Host, config.Username, config.Password)
 	if err != nil {
 		log.Fatal("Unable to init smtp client")
 	}
 
-	tg, err := tgbot.NewTelegramAPI(config.token, config.chatID)
+	db := repository.NewMapDB()
+
+	tg, err := tgbot.NewTelegramAPI(config.Token, config.ChatID)
 	if err != nil {
 		log.Fatal("Unable to init telegram bot")
 	}
-
-	db := repository.NewMapDB()
 
 	service := service.NewService(em, tg, db)
 	handler := &shopHandler{

@@ -8,11 +8,11 @@ import (
 )
 
 type Config struct {
-	token    string `yaml:"token"`
-	chatID   int64  `yaml:"chatid"`
-	host     string `yaml:"host"`
-	username string `yaml:"username"`
-	password string `yaml:"password"`
+	Token    string `yaml:"token"`
+	ChatID   int64  `yaml:"chatid"`
+	Host     string `yaml:"host"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 func ReadConfig(path string) (*Config, error) {
