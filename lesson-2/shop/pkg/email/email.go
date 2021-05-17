@@ -12,11 +12,14 @@ type EmailClient interface {
 }
 
 type emailClient struct {
-	cli *smtp.Client
+	cli      *smtp.Client
+	username string
+	password string
+	host     string
 }
 
-func NewSMTPClient(network, host string) (*emailClient, error) {
-	conn, err := net.Dial(network, host)
+func NewSMTPClient(network string, host string) (*emailClient, error) {
+	conn, err := net.Dial(network, host+":587")
 	if err != nil {
 		return nil, err
 	}
@@ -33,11 +36,9 @@ func (email *emailClient) SendOrderConfirmation(order *models.Order) error {
 
 	text := fmt.Sprintf("new order %d\nemail: %s\nphone: %s", order.ID, order.Email, order.Phone)
 
-	//Q: Не уверен, что хорошо делать аунтификацию прямо здесь. На мой взгляд это нужно делать в мэйне.
-	// Как все же правильнее?
-	//auth := smtp.PlainAuth("", "someuser@example.com", "password", "mail.example.com")
+	auth := smtp.PlainAuth("", email.username, email.password, email.host)
 
-	err := smtp.SendMail("mail.example.com:25", auth, "someuser@example.com", []string{order.Email}, []byte(text))
+	err := smtp.SendMail(email.host+":587", auth, email.username, []string{order.Email}, []byte(text))
 	if err != nil {
 		return err
 	}

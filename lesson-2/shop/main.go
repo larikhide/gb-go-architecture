@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,19 +16,23 @@ import (
 )
 
 func main() {
-	tg, err := tgbot.NewTelegramAPI("1561350817:AAH5bkKOgg9MRqAJLV-QTRFzIbrSUnjWoK8", -432234189)
+
+	flagConfigFile := flag.String("config", "./config-with-passwords.yaml", "File config in yaml format")
+	flag.Parse()
+
+	config, err := ReadConfig(*flagConfigFile)
 	if err != nil {
-		log.Fatal("Unable to init telegram bot")
+		panic(fmt.Sprintf("Not read config file. %s", err))
 	}
 
-	// TODO: инициализировать *email.emailClient для этого может понадобиться создать conn
-	/* conn, err := net.Dial("tcp", "mail.example.com")
-	if err != nil {
-		log.Fatal(err)
-	} */
-	em, err := email.NewSMTPClient("tcp", "mail.example.com")
+	em, err := email.NewSMTPClient("tcp", config.host)
 	if err != nil {
 		log.Fatal("Unable to init smtp client")
+	}
+
+	tg, err := tgbot.NewTelegramAPI(config.token, config.chatID)
+	if err != nil {
+		log.Fatal("Unable to init telegram bot")
 	}
 
 	db := repository.NewMapDB()
