@@ -16,9 +16,9 @@ type Service interface {
 }
 
 type service struct {
-	tg    tg.TelegramAPI
-	db    rep.Repository
-	email email.EmailClient
+	tg    tg.TelegramAPI    `yaml:"tg"`
+	db    rep.Repository    `yaml:"db"`
+	email email.EmailClient `yaml:"email"`
 }
 
 func (s *service) CreateOrder(order *models.Order) (*models.Order, error) {
