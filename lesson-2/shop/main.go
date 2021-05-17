@@ -25,7 +25,7 @@ func main() {
 		panic(fmt.Sprintf("Not read config file. %s", err))
 	}
 
-	em, err := email.NewSMTPClient("tcp", config.host)
+	em, err := email.NewSMTPClient(config.host, config.username, config.password)
 	if err != nil {
 		log.Fatal("Unable to init smtp client")
 	}

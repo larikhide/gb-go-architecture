@@ -2,7 +2,6 @@ package email
 
 import (
 	"fmt"
-	"net"
 	"net/smtp"
 	"shop/models"
 )
@@ -18,17 +17,11 @@ type emailClient struct {
 	host     string
 }
 
-func NewSMTPClient(network string, host string) (*emailClient, error) {
-	conn, err := net.Dial(network, host+":587")
-	if err != nil {
-		return nil, err
-	}
-	cli, err := smtp.NewClient(conn, host)
-	if err != nil {
-		return nil, err
-	}
+func NewSMTPClient(host, username, password string) (*emailClient, error) {
 	return &emailClient{
-		cli: cli,
+		host:     host,
+		username: username,
+		password: password,
 	}, nil
 }
 
