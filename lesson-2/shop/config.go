@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Token    string `yaml:"token"`
-	ChatID   int64  `yaml:"chatid"`
+	ChatID   int64  `yaml:"chat_id"`
 	Host     string `yaml:"host"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`

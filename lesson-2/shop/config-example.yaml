@@ -1,5 +1,5 @@
 token: "ssdfasdf"
-chatID: "123"
+chat_id: 123
 host: "smtp.mail.ru"
 unsername: "sender email"
 password: "password123"
