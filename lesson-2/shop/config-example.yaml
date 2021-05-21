@@ -1,0 +1,5 @@
+token: "ssdfasdf"
+chat_id: 123
+host: "smtp.mail.ru"
+unsername: "sender email"
+password: "password123"

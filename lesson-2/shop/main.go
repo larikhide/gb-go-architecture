@@ -1,26 +1,43 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 
+	"shop/pkg/email"
 	"shop/pkg/tgbot"
 	"shop/repository"
 	"shop/service"
 )
 
 func main() {
-	tg, err := tgbot.NewTelegramAPI("1561350817:AAH5bkKOgg9MRqAJLV-QTRFzIbrSUnjWoK8", -432234189)
+
+	flagConfigFile := flag.String("config", "./config-with-passwords.yaml", "File config in yaml format")
+	flag.Parse()
+
+	config, err := ReadConfig(*flagConfigFile)
 	if err != nil {
-		log.Fatal("Unable to init telegram bot")
+		panic(fmt.Sprintf("Not read config file. %s", err))
+	}
+
+	em, err := email.NewSMTPClient(config.Host, config.Username, config.Password)
+	if err != nil {
+		log.Fatal("Unable to init smtp client")
 	}
 
 	db := repository.NewMapDB()
 
-	service := service.NewService(tg, db)
+	tg, err := tgbot.NewTelegramAPI(config.Token, config.ChatID)
+	if err != nil {
+		log.Fatal("Unable to init telegram bot")
+	}
+
+	service := service.NewService(em, tg, db)
 	handler := &shopHandler{
 		service: service,
 		db:      db,
