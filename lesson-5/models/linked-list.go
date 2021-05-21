@@ -7,6 +7,7 @@ type LinkedList interface {
 
 	Add(prev *Node, node *Node)
 	Append(node *Node)
+	Preppend(node *Node)
 	Delete(node *Node)
 }
 
@@ -57,4 +58,17 @@ func (l *List) Add(prev *Node, node *Node) {
 	l.len++
 }
 
-//TODO: описать остальные методы
+func (l *List) Append(node *Node) {
+	return l.Add(l.tail, node)
+}
+
+func (l *List) Preppend(node *Node) {
+	return l.Add(nil, node)
+}
+
+func (l *List) Delete(node *Node) {
+
+	//TODO: описать удаление определенной ноды из списка
+
+	l.len--
+}
