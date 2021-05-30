@@ -37,7 +37,7 @@ func (l *List) Len() int {
 
 // Add insert new node *Node previous prev *Node
 func (l *List) Add(prev *Node, node *Node) {
-
+	l.len++
 	//если хотим вставить ноду в самое начало списка
 	if prev == nil {
 		node.next = l.head
@@ -55,20 +55,37 @@ func (l *List) Add(prev *Node, node *Node) {
 	node.prev = prev.prev
 	prev.prev = node
 
-	l.len++
 }
 
 func (l *List) Append(node *Node) {
-	return l.Add(l.tail, node)
+	l.Add(l.tail, node)
 }
 
 func (l *List) Preppend(node *Node) {
-	return l.Add(nil, node)
+	l.Add(nil, node)
 }
 
 func (l *List) Delete(node *Node) {
+	// если список состоит из 1 го элемента
+	if l.head == l.tail {
+		l.head = nil
+		l.tail = nil
+	}
 
-	//TODO: описать удаление определенной ноды из списка
+	if l.head != nil {
+		for tmp := l.head; tmp != l.tail; tmp = tmp.next {
+			if tmp.next == node && node != l.tail {
+				tmp.next = node.next
+			}
 
+			if tmp.next == node && node == l.tail {
+				tmp.next = nil
+				l.tail = tmp
+			}
+		}
+	}
+	if node == l.head {
+		l.head = node.next
+	}
 	l.len--
 }

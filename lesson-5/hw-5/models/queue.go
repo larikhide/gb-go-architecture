@@ -19,8 +19,17 @@ func (q *Queue) Push(data int) {
 	node := &Node{
 		Data: data,
 	}
-	// s.list.Append(node)
+	q.list.Append(node)
 }
 
-//TODO: write Pop method
+func (q *Queue) Pop() int {
+	if q.list.Len() == 0 {
+		return 0
+	}
+
+	elem := q.list.Head().Data
+	q.list.Delete(q.list.Head())
+	return elem
+}
+
 //TODO: create main.go
