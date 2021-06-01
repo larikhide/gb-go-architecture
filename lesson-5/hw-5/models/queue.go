@@ -31,5 +31,3 @@ func (q *Queue) Pop() int {
 	q.list.Delete(q.list.Head())
 	return elem
 }
-
-//TODO: create main.go

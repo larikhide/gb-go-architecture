@@ -51,9 +51,17 @@ func (l *List) Add(prev *Node, node *Node) {
 		return
 	}
 
-	node.next = prev
+	/* node.next = prev
 	node.prev = prev.prev
-	prev.prev = node
+	prev.prev = node */
+
+	node.next = prev.next
+	prev.next = node
+
+	// вставка перед последним элементом
+	if prev == l.tail {
+		l.tail = node
+	}
 
 }
 
@@ -66,12 +74,23 @@ func (l *List) Preppend(node *Node) {
 }
 
 func (l *List) Delete(node *Node) {
+	l.len--
 	// если список состоит из 1 го элемента
 	if l.head == l.tail {
 		l.head = nil
 		l.tail = nil
 	}
 
+	//если удаляется первый элемент, например, при реализации очереди
+	if node == l.head {
+		l.head = node.next
+	}
+	// если удаление из конца списка, например, при реализации стэка
+	if node == l.tail {
+		l.tail = node.prev
+	}
+
+	// если удаляется элемент не из конца и начала и не из 1го элемента
 	if l.head != nil {
 		for tmp := l.head; tmp != l.tail; tmp = tmp.next {
 			if tmp.next == node && node != l.tail {
@@ -84,8 +103,4 @@ func (l *List) Delete(node *Node) {
 			}
 		}
 	}
-	if node == l.head {
-		l.head = node.next
-	}
-	l.len--
 }

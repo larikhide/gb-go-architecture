@@ -27,7 +27,6 @@ func (s *Stack) Pop() int {
 		return 0
 	}
 
-	//TODO: why nil pointer dereference?
 	elem := s.list.Tail().Data
 	s.list.Delete(s.list.Tail())
 	return elem
