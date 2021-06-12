@@ -1,0 +1,3 @@
+[submodule "lesson-6/shop"]
+	path = lesson-6/shop
+	url = https://gitlab.com/larikhide/shop
